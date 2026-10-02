@@ -19,13 +19,13 @@ button:disabled{opacity:.45}
 .app{max-width:720px;margin:0 auto;padding:8px 8px calc(22px + env(safe-area-inset-bottom))}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:8px;margin-bottom:10px}
 .main-panel{padding-bottom:10px}
-.topbar{display:grid;grid-template-columns:1.2fr 1.2fr .42fr;gap:7px;align-items:center}
+.topbar{display:grid;grid-template-columns:1fr .42fr;gap:7px;align-items:center}
 .topbar button{height:44px;font-size:15px;padding:5px 8px}
 .viewport{margin-top:8px;height:31vh;min-height:190px;max-height:330px;background:#ddd;border-radius:15px;display:flex;justify-content:center;align-items:center;overflow:hidden;padding:7px}
 .viewport img{display:block;width:auto;height:auto;object-fit:contain}
 .viewport.full img{max-width:100%;max-height:100%}
 .viewport.mark{align-items:flex-start}
-.viewport.mark img{height:150%;max-width:none;max-height:none}
+.viewport.mark img{height:172.5%;max-width:none;max-height:none}
 .pad{margin-top:7px}
 .rankrows{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .pick{height:48px;font-size:17px;font-weight:600;padding:5px}
@@ -66,12 +66,11 @@ button:disabled{opacity:.45}
 <main class="app">
   <section class="panel main-panel">
     <div class="topbar">
-      <button id="full" class="active">ENTIRE CARD</button>
-      <button id="mark">x1.5 MARK</button>
+      <button id="mark" class="active">x1.7 MARK</button>
       <button id="new">NEW</button>
     </div>
 
-    <div id="viewport" class="viewport full"><img id="card" alt="Marked card"></div>
+    <div id="viewport" class="viewport mark"><img id="card" alt="Marked card"></div>
 
     <div class="pad">
       <div id="ranks" class="rankrows"></div>
@@ -114,8 +113,8 @@ function cardObj(){return CARDS.find(x=>x.id===current)}
 function statsUI(){$('seen').textContent=stats.seen;$('attempted').textContent=stats.attempted;$('correct').textContent=stats.correct;$('pct').textContent=stats.attempted?Math.round(stats.correct/stats.attempted*100):0;$('remaining').textContent=deck.length}
 function clearPick(){rank=suit=null;document.querySelectorAll('.pick.selected').forEach(x=>x.classList.remove('selected'));setFeedback('')}
 function setFeedback(text='',kind=''){$('feedback').textContent=text;$('feedback').className='feedback '+kind}
-function setView(mode){$('viewport').className='viewport '+mode;$('full').classList.toggle('active',mode==='full');$('mark').classList.toggle('active',mode==='mark')}
-function nextCard(){if(!deck.length)deck=shuf(CARDS.map(x=>x.id));current=deck.pop();$('card').src=cardObj().src;stats.seen++;done=false;clearPick();$('next').disabled=true;setView('full');statsUI();window.scrollTo({top:0,behavior:'smooth'})}
+function setView(){ $('viewport').className='viewport mark'; $('mark').classList.add('active'); }
+function nextCard(){if(!deck.length)deck=shuf(CARDS.map(x=>x.id));current=deck.pop();$('card').src=cardObj().src;stats.seen++;done=false;clearPick();$('next').disabled=true;setView();statsUI();window.scrollTo({top:0,behavior:'smooth'})}
 function check(){if(done)return;if(!rank||!suit){setFeedback('RANK + SUIT','bad');return}stats.attempted++;if(rank+suit===current){stats.correct++;setFeedback('✓ '+pretty(current),'good')}else setFeedback('✗ '+pretty(current),'bad');done=true;$('next').disabled=false;statsUI()}
 function reveal(){setFeedback(pretty(current));done=true;$('next').disabled=false}
 RANKS.slice(0,12).forEach(r=>{const b=document.createElement('button');b.className='pick';b.textContent=r;b.onclick=()=>{rank=r;document.querySelectorAll('#ranks .pick,#kbtn').forEach(x=>x.classList.toggle('selected',x===b));};$('ranks').appendChild(b)});
@@ -123,7 +122,7 @@ $('kbtn').onclick=()=>{rank='K';document.querySelectorAll('#ranks .pick,#kbtn').
 SUITS.forEach(s=>{const b=document.createElement('button');b.className='pick '+((s.c==='H'||s.c==='D')?'red':'');b.textContent=s.s;b.onclick=()=>{suit=s.c;[...$('suits').children].forEach(x=>x.classList.toggle('selected',x===b));};$('suits').appendChild(b)});
 $('check').onclick=check;$('clear').onclick=clearPick;$('next').onclick=nextCard;$('show').onclick=reveal;
 $('new').onclick=()=>{stats={seen:0,attempted:0,correct:0};deck=shuf(CARDS.map(x=>x.id));statsUI();nextCard()};
-$('full').onclick=()=>setView('full');$('mark').onclick=()=>setView('mark');
+$('full').onclick=()=>setView();$('mark').onclick=()=>setView('mark');
 deck=shuf(CARDS.map(x=>x.id));nextCard();
 </script>
 </body>
